@@ -17,9 +17,9 @@ const LoginScreen = ({ navigation }: any) => {
 	const [password, setPassword] = useState("");
 	const { login, isLoggingIn, loginError } = useAuth();
 
-	const handleLogin = () => {
+	function handleLogin() {
 		login({ email, password });
-	};
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
