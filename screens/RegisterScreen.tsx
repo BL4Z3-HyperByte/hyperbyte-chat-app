@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../hooks/useAuth";
 
-const RegisterScreen = ({ navigation }: any) => {
+function RegisterScreen({ navigation }: any) {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -21,7 +21,7 @@ const RegisterScreen = ({ navigation }: any) => {
 
 	const { register, isRegistering, registerError } = useAuth();
 
-	const handleRegister = () => {
+	function handleRegister() {
 		if (password !== confirmPassword) {
 			setPasswordError("Passwords do not match");
 			return;
@@ -33,7 +33,7 @@ const RegisterScreen = ({ navigation }: any) => {
 			email,
 			password,
 		});
-	};
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -105,7 +105,7 @@ const RegisterScreen = ({ navigation }: any) => {
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
-};
+}
 
 const styles = StyleSheet.create({
 	container: {
