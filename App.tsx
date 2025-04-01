@@ -1,8 +1,8 @@
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { AuthProvider } from "./Contexts/AuthContext";
 import AppNavigator from "./Navigation/AppNavigator";
+import { AuthProvider } from "./Contexts/AuthContext";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -17,9 +17,9 @@ const App = () => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<SafeAreaProvider>
-				{/* <AuthProvider> */}
-				<AppNavigator />
-				{/* </AuthProvider> */}
+				<AuthProvider>
+					<AppNavigator />
+				</AuthProvider>
 			</SafeAreaProvider>
 		</QueryClientProvider>
 	);
