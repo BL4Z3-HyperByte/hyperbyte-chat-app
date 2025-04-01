@@ -7,7 +7,7 @@ export const useRooms = (userId: string) => {
 
 	const getRoomsForUser = async () => {
 		const response = await fetch(
-			`${process.env.CHAT_API}/rooms/user/${userId}`
+			`${process.env.EXPO_PUBLIC_CHAT_API}/rooms/user/${userId}`
 		);
 		if (!response.ok) {
 			throw new Error("Failed to fetch rooms");
