@@ -8,7 +8,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContextType, CreateUserRequest, User } from "../types";
 import { setAuthToken } from "../axio";
-// import { userApi } from "../api/userAPI";
+import { userApi } from "../api/userAPI";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -43,13 +43,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setIsLoading(true);
 
 		try {
-			const response = await fetch("https://your-api-url.com/api/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(credentials),
-			});
+			const response = await fetch(
+				`${process.env.EXPO_PUBLIC_CHAT_API}/login`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(credentials),
+				}
+			);
 
 			if (!response.ok) {
 				throw new Error("Login failed");
@@ -114,10 +117,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-export function useAuth() {
-	const context = useContext(AuthContext);
-	if (context === undefined) {
-		throw new Error("useAuth must be used within an AuthProvider");
-	}
-	return context;
-}
+// export function useAuth() {
+// 	const context = useContext(AuthContext);
+// 	if (context === undefined) {
+// 		throw new Error("useAuth must be used within an AuthProvider");
+// 	}
+// 	return context;
+// }
