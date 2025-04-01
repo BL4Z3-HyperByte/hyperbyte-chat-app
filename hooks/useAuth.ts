@@ -1,4 +1,3 @@
-// src/hooks/useAuth.ts
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { CreateUserRequest, User } from "../types";
@@ -11,7 +10,7 @@ interface AuthState {
 	isAuthenticated: boolean;
 }
 
-export const useAuth = () => {
+export function useAuth() {
 	const [authState, setAuthState] = useState<AuthState>({
 		user: null,
 		token: null,
@@ -23,14 +22,16 @@ export const useAuth = () => {
 			email: string;
 			password: string;
 		}) => {
-			// Replace with your actual login endpoint
-			const response = await fetch("https://your-api-url.com/api/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(credentials),
-			});
+			const response = await fetch(
+				`${process.env.EXPO_PUBLIC_CHAT_API}/login`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(credentials),
+				}
+			);
 
 			if (!response.ok) {
 				throw new Error("Login failed");
@@ -80,4 +81,4 @@ export const useAuth = () => {
 		loginError: loginMutation.error,
 		registerError: registerMutation.error,
 	};
-};
+}
