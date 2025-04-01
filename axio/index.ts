@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.CHAT_API;
+const BASE_URL = process.env.EXPO_PUBLIC_CHAT_API;
 
 const apiClient = axios.create({
 	baseURL: BASE_URL,
