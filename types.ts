@@ -4,12 +4,10 @@ export interface ServerMessage {
 	createdAt: string;
 	userId: string;
 	roomId: string;
-	// Add more message properties as needed
 }
 
 export interface SendMessageRequest {
 	text: string;
-	// Add more fields as needed
 }
 
 export interface Room {
@@ -18,13 +16,11 @@ export interface Room {
 	participants: string[]; // User IDs
 	createdAt: string;
 	lastActivity?: string;
-	// Add more room properties as needed
 }
 
 export interface CreateRoomRequest {
 	name: string;
 	participants: string[]; // User IDs
-	// Add more fields as needed
 }
 
 export interface User {
@@ -33,18 +29,25 @@ export interface User {
 	email: string;
 }
 
-export interface CreateUserRequest {
+export interface RegisterUserRequest {
 	username: string;
 	email: string;
 	password: string;
-	// Add more fields as needed
+}
+
+export interface AuthenticateUserRequest {
+	email: string;
+	password: string;
 }
 
 export interface AuthContextType {
 	user: User | null;
 	isAuthenticated: boolean;
-	isLoading: boolean;
-	login: (credentials: { email: string; password: string }) => Promise<void>;
-	register: (userData: CreateUserRequest) => Promise<void>;
+	isLoggingIn: boolean;
+	isRegistering: boolean;
+	loggingInError: Error | null;
+	registrationError: Error | null;
+	login: (credentials: AuthenticateUserRequest) => void;
+	register: (userData: RegisterUserRequest) => void;
 	logout: () => void;
 }
