@@ -11,12 +11,15 @@ export function AppStack() {
 				name='Rooms'
 				component={RoomsScreen}
 				options={{
-					headerShown: false,
+					headerShown: true,
 				}}
 			/>
 			<Stack.Screen
 				name='Chat'
 				component={ChatScreen}
+				options={{
+					headerShown: true,
+				}}
 			/>
 		</Stack.Navigator>
 	);
