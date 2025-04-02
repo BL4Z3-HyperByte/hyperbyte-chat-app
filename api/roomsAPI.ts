@@ -2,17 +2,21 @@ import apiClient from "../axio";
 import { CreateRoomRequest, Room } from "../types";
 
 export const roomsApi = {
+	getRooms: async (): Promise<Room[]> => {
+		const response = await apiClient.get("/chat/rooms/");
+		return response.data;
+	},
 	createRoom: async (roomData: CreateRoomRequest): Promise<Room> => {
-		const response = await apiClient.post("/rooms/create", roomData);
+		const response = await apiClient.post("/chat/rooms/create", roomData);
 		return response.data;
 	},
 
 	joinRoom: async (roomId: string): Promise<Room> => {
-		const response = await apiClient.post(`/rooms/join/${roomId}`);
+		const response = await apiClient.post(`/chat/rooms/join/${roomId}`);
 		return response.data;
 	},
 
 	leaveRoom: async (roomId: string): Promise<void> => {
-		await apiClient.delete(`/rooms/leave/${roomId}`);
+		await apiClient.delete(`/chat/rooms/leave/${roomId}`);
 	},
 };
