@@ -10,12 +10,12 @@ import {
 	Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../Contexts/AuthContext";
 
 const LoginScreen = ({ navigation }: any) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const { login, isLoggingIn, loginError } = useAuth();
+	const { login, isLoggingIn, loggingInError } = useAuth();
 
 	function handleLogin() {
 		login({ email, password });
@@ -46,10 +46,10 @@ const LoginScreen = ({ navigation }: any) => {
 						secureTextEntry
 					/>
 
-					{loginError && (
+					{loggingInError && (
 						<Text style={styles.errorText}>
-							{loginError instanceof Error
-								? loginError.message
+							{loggingInError instanceof Error
+								? loggingInError.message
 								: "Login failed"}
 						</Text>
 					)}
