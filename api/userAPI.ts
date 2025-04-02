@@ -1,30 +1,23 @@
 import { User } from "react-native-gifted-chat";
 import apiClient from "../axio";
-import { CreateUserRequest } from "../types";
+import { RegisterUserRequest } from "../types";
 
 export const userApi = {
-	createUser: async (userData: CreateUserRequest): Promise<User> => {
-		const response = await apiClient.post("/user/create", userData);
+	getUser: async (userId: string) => {
+		const response = await apiClient.get(`/users/${userId}`);
 		return response.data;
 	},
 
-	getUser: async (userId: string): Promise<User> => {
-		const response = await apiClient.get(`/user/${userId}`);
+	getUsers: async () => {
+		const response = await apiClient.get(`/`);
 		return response.data;
 	},
 
-	updateUser: async (
-		userId: string,
-		userData: Partial<User>
-	): Promise<User> => {
+	updateUser: async (userId: string, userData: Partial<User>) => {
 		const response = await apiClient.patch(
-			`/user/upadte/${userId}`,
+			`/users/update/${userId}`,
 			userData
 		);
 		return response.data;
-	},
-
-	deleteUser: async (userId: string): Promise<void> => {
-		await apiClient.delete(`/user/delete/${userId}`);
 	},
 };
