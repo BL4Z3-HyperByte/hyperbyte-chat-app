@@ -10,7 +10,7 @@ import {
 	Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../Contexts/AuthContext";
 
 function RegisterScreen({ navigation }: any) {
 	const [username, setUsername] = useState("");
@@ -19,7 +19,7 @@ function RegisterScreen({ navigation }: any) {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [passwordError, setPasswordError] = useState("");
 
-	const { register, isRegistering, registerError } = useAuth();
+	const { register, isRegistering, registrationError } = useAuth();
 
 	function handleRegister() {
 		if (password !== confirmPassword) {
@@ -77,10 +77,10 @@ function RegisterScreen({ navigation }: any) {
 
 					{passwordError ? (
 						<Text style={styles.errorText}>{passwordError}</Text>
-					) : registerError ? (
+					) : registrationError ? (
 						<Text style={styles.errorText}>
-							{registerError instanceof Error
-								? registerError.message
+							{registrationError instanceof Error
+								? registrationError.message
 								: "Registration failed"}
 						</Text>
 					) : null}
