@@ -6,16 +6,16 @@ import React, {
 	useEffect,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AuthContextType, CreateUserRequest, User } from "../types";
+import { AuthContextType, User } from "../types";
 import { setAuthToken } from "../axio";
-import { userApi } from "../api/userAPI";
+import { useMutation } from "@tanstack/react-query";
+import { authApi } from "../api/authAPI";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
 
 	// Load Stored Token
 	useEffect(() => {
@@ -31,35 +31,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				}
 			} catch (error) {
 				console.error("Failed to load auth info:", error);
-			} finally {
-				setIsLoading(false);
 			}
 		}
 
 		loadStoredAuth();
 	}, []);
 
-	async function login(credentials: { email: string; password: string }) {
-		setIsLoading(true);
-
-		try {
-			const response = await fetch(
-				`${process.env.EXPO_PUBLIC_CHAT_API}/login`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(credentials),
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error("Login failed");
-			}
-
-			const data = await response.json();
-			const { user, token } = data;
+	const loginMutation = useMutation({
+		mutationFn: async (vars: { email: string; password: string }) => {
+			const { email, password } = vars;
+			return await authApi.login({ email: email, password: password });
+		},
+		async onSuccess(data: { data: { user: User; token: string } }) {
+			const { token, user } = data.data;
 
 			await AsyncStorage.setItem("user", JSON.stringify(user));
 			await AsyncStorage.setItem("token", token);
@@ -67,30 +51,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setAuthToken(token);
 			setUser(user);
 			setIsAuthenticated(true);
-		} catch (error) {
-			console.error("Login error:", error);
-			throw error;
-		} finally {
-			setIsLoading(false);
-		}
-	}
+		},
+	});
 
-	async function register(userData: CreateUserRequest) {
-		setIsLoading(true);
-
-		try {
-			await userApi.createUser(userData);
-		} catch (error) {
-			console.error("Registration error:", error);
-			throw error;
-		} finally {
-			setIsLoading(false);
-		}
-	}
+	const registerMutation = useMutation({
+		mutationFn: async (vars: {
+			email: string;
+			password: string;
+			username: string;
+		}) => {
+			return authApi.register({
+				email: vars.email,
+				username: vars.username,
+				password: vars.password,
+			});
+		},
+	});
 
 	async function logout() {
 		try {
-			// Clear stored auth data
 			await AsyncStorage.removeItem("user");
 			await AsyncStorage.removeItem("token");
 
@@ -107,20 +86,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			value={{
 				user,
 				isAuthenticated,
-				isLoading,
-				login,
-				register,
+				isRegistering: registerMutation.isPending,
+				registrationError: registerMutation.error,
+				isLoggingIn: loginMutation.isPending,
+				loggingInError: loginMutation.error,
+				login: loginMutation.mutate,
+				register: registerMutation.mutate,
 				logout,
 			}}>
-			{!isLoading && children}
+			{children}
 		</AuthContext.Provider>
 	);
 }
 
-// export function useAuth() {
-// 	const context = useContext(AuthContext);
-// 	if (context === undefined) {
-// 		throw new Error("useAuth must be used within an AuthProvider");
-// 	}
-// 	return context;
-// }
+export function useAuth() {
+	const context = useContext(AuthContext);
+	if (context === undefined) {
+		throw new Error("useAuth must be used within an AuthProvider");
+	}
+	return context;
+}
