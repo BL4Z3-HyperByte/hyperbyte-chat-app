@@ -11,54 +11,55 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRooms } from "../hooks/useRooms";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../Contexts/AuthContext";
 
-const RoomsScreen = ({ navigation }: any) => {
+function RoomsScreen({ navigation }: any) {
 	const { user } = useAuth();
-	const userId = user?.id || "";
 
-	const { rooms, isLoading, createRoom, joinRoom } = useRooms(userId);
+	const { rooms, isLoading, createRoom, joinRoom } = useRooms(user?.id || "");
 
 	const [showNewRoomModal, setShowNewRoomModal] = useState(false);
 	const [newRoomName, setNewRoomName] = useState("");
 	const [joinRoomId, setJoinRoomId] = useState("");
 	const [showJoinRoomModal, setShowJoinRoomModal] = useState(false);
 
-	const handleCreateRoom = () => {
+	function handleCreateRoom() {
 		if (newRoomName.trim()) {
 			createRoom({
 				name: newRoomName,
-				participants: [userId],
+				participants: [user!.id],
 			});
 			setNewRoomName("");
 			setShowNewRoomModal(false);
 		}
-	};
+	}
 
-	const handleJoinRoom = () => {
+	function handleJoinRoom() {
 		if (joinRoomId.trim()) {
 			joinRoom(joinRoomId);
 			setJoinRoomId("");
 			setShowJoinRoomModal(false);
 		}
-	};
+	}
 
-	const renderRoom = ({ item }: { item: any }) => (
-		<TouchableOpacity
-			style={styles.roomItem}
-			onPress={() =>
-				navigation.navigate("Chat", {
-					roomId: item.id,
-					roomName: item.name,
-				})
-			}>
-			<Text style={styles.roomName}>{item.name}</Text>
-			<Text style={styles.roomParticipants}>
-				{item.participants.length} participant
-				{item.participants.length !== 1 ? "s" : ""}
-			</Text>
-		</TouchableOpacity>
-	);
+	function renderRoom({ item }: { item: any }) {
+		return (
+			<TouchableOpacity
+				style={styles.roomItem}
+				onPress={() =>
+					navigation.navigate("Chat", {
+						roomId: item.id,
+						roomName: item.name,
+					})
+				}>
+				<Text style={styles.roomName}>{item.name}</Text>
+				<Text style={styles.roomParticipants}>
+					{item.participants.length} participant
+					{item.participants.length !== 1 ? "s" : ""}
+				</Text>
+			</TouchableOpacity>
+		);
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -187,7 +188,7 @@ const RoomsScreen = ({ navigation }: any) => {
 			</Modal>
 		</SafeAreaView>
 	);
-};
+}
 
 const styles = StyleSheet.create({
 	container: {
