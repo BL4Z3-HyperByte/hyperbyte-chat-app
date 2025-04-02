@@ -1,23 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreateRoomRequest, Room } from "../types";
+import { CreateRoomRequest } from "../types";
 import { roomsApi } from "../api/roomsAPI";
 
-export const useRooms = (userId: string) => {
+export function useRooms(userId: string) {
 	const queryClient = useQueryClient();
-
-	const getRoomsForUser = async () => {
-		const response = await fetch(
-			`${process.env.EXPO_PUBLIC_CHAT_API}/rooms/user/${userId}`
-		);
-		if (!response.ok) {
-			throw new Error("Failed to fetch rooms");
-		}
-		return response.json() as Promise<Room[]>;
-	};
 
 	const roomsQuery = useQuery({
 		queryKey: ["rooms", userId],
-		queryFn: getRoomsForUser,
+		queryFn: async () => {
+			return roomsApi.getRooms();
+		},
 	});
 
 	const createRoomMutation = useMutation({
@@ -50,4 +42,4 @@ export const useRooms = (userId: string) => {
 		joinRoom: joinRoomMutation.mutate,
 		leaveRoom: leaveRoomMutation.mutate,
 	};
-};
+}
