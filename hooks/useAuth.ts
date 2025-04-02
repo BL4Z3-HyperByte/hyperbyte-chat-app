@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { CreateUserRequest, User } from "../types";
+import { RegisterUserRequest, User } from "../types";
 import { setAuthToken } from "../axio";
 import { userApi } from "../api/userAPI";
 
@@ -10,11 +10,15 @@ interface AuthState {
 	isAuthenticated: boolean;
 }
 
-export function useAuth() {
+function useAuth() {
 	const [authState, setAuthState] = useState<AuthState>({
 		user: null,
 		token: null,
 		isAuthenticated: false,
+	});
+
+	useEffect(() => {
+		console.log(authState);
 	});
 
 	const loginMutation = useMutation({
@@ -23,7 +27,7 @@ export function useAuth() {
 			password: string;
 		}) => {
 			const response = await fetch(
-				`${process.env.EXPO_PUBLIC_CHAT_API}/login`,
+				`${process.env.EXPO_PUBLIC_CHAT_API}/auth/login`,
 				{
 					method: "POST",
 					headers: {
@@ -51,11 +55,9 @@ export function useAuth() {
 	});
 
 	const registerMutation = useMutation({
-		mutationFn: (userData: CreateUserRequest) =>
+		mutationFn: (userData: RegisterUserRequest) =>
 			userApi.createUser(userData),
 		onSuccess: (user) => {
-			// Typically, registration doesn't log you in automatically
-			// You might want to automatically log in the user or redirect to login
 			console.log("Registration successful", user);
 		},
 	});
