@@ -1,9 +1,13 @@
 export interface ServerMessage {
 	id: string;
-	text: string;
-	createdAt: string;
-	userId: string;
 	roomId: string;
+	senderId: string;
+	message: {
+		type: "media" | "text";
+		content: string;
+	};
+	read: "read" | "unread";
+	timestamp: string;
 }
 
 export interface SendMessageRequest {
