@@ -8,6 +8,7 @@ import {
 	ActivityIndicator,
 	TextInput,
 	Modal,
+	Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRooms } from "../hooks/useRooms";
@@ -42,7 +43,7 @@ function RoomsScreen({ navigation }: any) {
 		}
 	}
 
-	function renderRoom({ item }: { item: any }) {
+	function Room({ item }: { item: any }) {
 		return (
 			<TouchableOpacity
 				style={styles.roomItem}
@@ -52,11 +53,19 @@ function RoomsScreen({ navigation }: any) {
 						roomName: item.name,
 					})
 				}>
-				<Text style={styles.roomName}>{item.name}</Text>
-				<Text style={styles.roomParticipants}>
-					{item.participants.length} participant
-					{item.participants.length !== 1 ? "s" : ""}
-				</Text>
+				<Image
+					source={{
+						uri: "https://cdn.pixabay.com/photo/2016/04/15/18/05/computer-1331579_640.png",
+					}}
+					style={styles.roomIcon}
+				/>
+				<View>
+					<Text style={styles.roomName}>{item.name}</Text>
+					<Text style={styles.roomParticipants}>
+						{item.participants.length} Participant
+						{item.participants.length !== 1 ? "s" : ""}
+					</Text>
+				</View>
 			</TouchableOpacity>
 		);
 	}
@@ -85,11 +94,13 @@ function RoomsScreen({ navigation }: any) {
 					color='#007bff'
 					style={styles.loader}
 				/>
-			) : rooms.length > 0 ? (
+			) : rooms.length && rooms.length > 0 ? (
 				<FlatList
-					data={rooms}
-					renderItem={renderRoom}
-					keyExtractor={(item) => item.id}
+					data={rooms ?? []}
+					renderItem={Room}
+					keyExtractor={(item) => {
+						return item.id;
+					}}
 					contentContainerStyle={styles.roomsList}
 				/>
 			) : (
@@ -243,6 +254,11 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 2,
 		elevation: 2,
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "flex-start",
+		gap: 12,
 	},
 	roomName: {
 		fontSize: 16,
@@ -252,6 +268,11 @@ const styles = StyleSheet.create({
 	roomParticipants: {
 		color: "#666",
 		fontSize: 14,
+	},
+	roomIcon: {
+		width: 52,
+		height: 52,
+		padding: 8,
 	},
 	loader: {
 		flex: 1,
