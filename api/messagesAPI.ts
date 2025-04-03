@@ -1,14 +1,14 @@
 import { IMessage } from "react-native-gifted-chat";
 import apiClient from "../axio";
-import { SendMessageRequest, ServerMessage } from "../types";
+import { ServerMessage } from "../types";
 
 export const messagesApi = {
 	sendMessage: async (
 		roomId: string,
-		messageData: SendMessageRequest
+		messageData: Partial<ServerMessage>
 	): Promise<ServerMessage> => {
 		const response = await apiClient.post(
-			`/messages/send/${roomId}`,
+			`chat/messages/send/${roomId}`,
 			messageData
 		);
 		return response.data;
@@ -19,28 +19,39 @@ export const messagesApi = {
 		page: number
 	): Promise<ServerMessage[]> => {
 		const response = await apiClient.get(
-			`/messsages/loadChat/${roomId}/${page}`
+			`chat/messages/loadChat/${roomId}/${page}`
 		);
-		return response.data;
+		return response.data.data.messages;
 	},
 
 	markLastRead: async (roomId: string, messageId: string): Promise<void> => {
-		await apiClient.patch(`/messages/lastRead/${roomId}/${messageId}`);
+		await apiClient.patch(`chat/messages/lastRead/${roomId}/${messageId}`);
 	},
 
 	clearChat: async (roomId: string): Promise<void> => {
-		await apiClient.delete(`/messages/clearChat/${roomId}`);
+		await apiClient.delete(`chat/messages/clearChat/${roomId}`);
 	},
 
 	convertToGiftedChat: (messages: ServerMessage[]): IMessage[] => {
-		return messages.map((msg) => ({
-			_id: msg.id,
-			text: msg.text,
-			createdAt: new Date(msg.createdAt),
-			user: {
-				_id: msg.userId,
-				// You might want to include more user details here if available
-			},
-		}));
+		const convertedMessages = messages.map((msg) => {
+			const giftedChatMessage: IMessage = {
+				_id: msg.id,
+				text: "",
+				createdAt: new Date(msg.timestamp),
+				user: {
+					_id: msg.senderId,
+				},
+			};
+
+			if (msg.message.type === "media") {
+				giftedChatMessage.image = msg.message.content;
+			} else {
+				giftedChatMessage.text = msg.message.content;
+			}
+
+			return giftedChatMessage;
+		});
+
+		return convertedMessages;
 	},
 };
