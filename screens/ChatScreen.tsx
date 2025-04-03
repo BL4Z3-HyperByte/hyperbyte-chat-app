@@ -1,4 +1,3 @@
-// src/screens/ChatScreen.tsx
 import React, { useEffect } from "react";
 import {
 	View,
@@ -15,8 +14,8 @@ import {
 	Send,
 } from "react-native-gifted-chat";
 import { useChat } from "../hooks/useChat";
-import { useAuth } from "../hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "../Contexts/AuthContext";
 
 const ChatScreen = ({ route, navigation }: any) => {
 	const { roomId, roomName } = route.params;
@@ -32,7 +31,10 @@ const ChatScreen = ({ route, navigation }: any) => {
 		clearChat,
 	} = useChat(roomId, userId);
 
-	// Set navigation header title
+	useEffect(() => {
+		console.log(messages);
+	}, [messages]);
+
 	useEffect(() => {
 		navigation.setOptions({
 			title: roomName,
@@ -59,7 +61,7 @@ const ChatScreen = ({ route, navigation }: any) => {
 		});
 	}, [navigation, roomName]);
 
-	const renderBubble = (props: any) => {
+	const TextBubble = (props: any) => {
 		return (
 			<Bubble
 				{...props}
@@ -83,7 +85,7 @@ const ChatScreen = ({ route, navigation }: any) => {
 		);
 	};
 
-	const renderInputToolbar = (props: any) => {
+	const CustomInputToolbar = (props: any) => {
 		return (
 			<InputToolbar
 				{...props}
@@ -97,32 +99,32 @@ const ChatScreen = ({ route, navigation }: any) => {
 		);
 	};
 
-	const renderSend = (props: any) => {
-		return (
-			<Send
-				{...props}
-				disabled={!props.text}
-				containerStyle={{
-					width: 44,
-					height: 44,
-					alignItems: "center",
-					justifyContent: "center",
-					marginHorizontal: 4,
-				}}>
-				<View
-					style={{
-						width: 32,
-						height: 32,
-						borderRadius: 16,
-						backgroundColor: props.text ? "#007bff" : "#ccc",
-						alignItems: "center",
-						justifyContent: "center",
-					}}>
-					<Text style={{ color: "#fff", fontSize: 16 }}>→</Text>
-				</View>
-			</Send>
-		);
-	};
+	// const SendButton = (props: any) => {
+	// 	return (
+	// 		<Send
+	// 			{...props}
+	// 			disabled={!props.text}
+	// 			containerStyle={{
+	// 				width: 44,
+	// 				height: 44,
+	// 				alignItems: "center",
+	// 				justifyContent: "center",
+	// 				marginHorizontal: 4,
+	// 			}}>
+	// 			<View
+	// 				style={{
+	// 					width: 32,
+	// 					height: 32,
+	// 					borderRadius: 16,
+	// 					backgroundColor: props.text ? "#007bff" : "#ccc",
+	// 					alignItems: "center",
+	// 					justifyContent: "center",
+	// 				}}>
+	// 				<Text style={{ color: "#fff", fontSize: 16 }}>→</Text>
+	// 			</View>
+	// 		</Send>
+	// 	);
+	// };
 
 	if (error) {
 		return (
@@ -157,13 +159,12 @@ const ChatScreen = ({ route, navigation }: any) => {
 					user={{
 						_id: userId,
 						name: user?.username || "User",
-						avatar: user?.avatar || undefined,
+						avatar: "",
 					}}
-					renderBubble={renderBubble}
-					renderInputToolbar={renderInputToolbar}
-					renderSend={renderSend}
+					renderBubble={TextBubble}
+					renderInputToolbar={CustomInputToolbar}
+					// renderSend={SendButton}
 					alwaysShowSend
-					scrollToBottom
 					infiniteScroll
 					loadEarlier={messages.length > 0}
 					onLoadEarlier={loadMoreMessages}
