@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IMessage } from "react-native-gifted-chat";
 import { messagesApi } from "../api/messagesAPI";
+import { ServerMessage } from "../types";
 
-export const useChat = (roomId: string, userId: string) => {
+export function useChat(roomId: string, userId: string) {
 	const [page, setPage] = useState(1);
 	const [allMessages, setAllMessages] = useState<IMessage[]>([]);
 	const queryClient = useQueryClient();
@@ -15,7 +16,8 @@ export const useChat = (roomId: string, userId: string) => {
 	});
 
 	const sendMessageMutation = useMutation({
-		mutationFn: (text: string) => messagesApi.sendMessage(roomId, { text }),
+		mutationFn: (msg: Partial<ServerMessage>) =>
+			messagesApi.sendMessage(roomId, msg),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["messages", roomId] });
 		},
@@ -34,25 +36,21 @@ export const useChat = (roomId: string, userId: string) => {
 		},
 	});
 
-	// Update allMessages when messagesQuery data changes
 	useEffect(() => {
 		if (messagesQuery.data) {
 			const newMessages = messagesApi.convertToGiftedChat(
-				messagesQuery.data
+				messagesQuery.data ?? []
 			);
 
-			// Append new messages to existing ones for pagination
 			setAllMessages((prev) => {
 				const combinedMessages = [...prev, ...newMessages];
 
-				// Filter out duplicates based on _id
 				const uniqueMessages = Array.from(
 					new Map(
 						combinedMessages.map((msg) => [msg._id, msg])
 					).values()
 				);
 
-				// Sort messages by createdAt in descending order (newest first)
 				return uniqueMessages.sort(
 					(a, b) =>
 						(b.createdAt as Date).getTime() -
@@ -60,7 +58,6 @@ export const useChat = (roomId: string, userId: string) => {
 				);
 			});
 
-			// Mark latest message as read if it's not from current user
 			if (newMessages.length > 0) {
 				const latestMessage = newMessages[0];
 				if (latestMessage.user._id !== userId) {
@@ -70,7 +67,6 @@ export const useChat = (roomId: string, userId: string) => {
 		}
 	}, [messagesQuery.data]);
 
-	// Load more messages (pagination)
 	function loadMoreMessages() {
 		setPage((prev) => prev + 1);
 	}
@@ -78,7 +74,16 @@ export const useChat = (roomId: string, userId: string) => {
 	// Send a message
 	function sendMessage(messages: IMessage[]) {
 		const [message] = messages;
-		sendMessageMutation.mutate(message.text);
+
+		const messageToSend: Partial<ServerMessage> = {
+			read: "unread",
+			message: {
+				type: message.image ? "media" : "text",
+				content: message.image ?? message.text,
+			},
+		};
+
+		sendMessageMutation.mutate(messageToSend);
 	}
 
 	return {
@@ -89,4 +94,4 @@ export const useChat = (roomId: string, userId: string) => {
 		loadMoreMessages,
 		clearChat: clearChatMutation.mutate,
 	};
-};
+}
