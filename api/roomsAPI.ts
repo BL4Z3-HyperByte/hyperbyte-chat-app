@@ -4,7 +4,7 @@ import { CreateRoomRequest, Room } from "../types";
 export const roomsApi = {
 	getRooms: async (): Promise<Room[]> => {
 		const response = await apiClient.get("/chat/rooms");
-		return response.data;
+		return response.data.data.rooms;
 	},
 
 	createRoom: async (roomData: CreateRoomRequest): Promise<Room> => {
